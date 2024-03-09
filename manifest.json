@@ -6,12 +6,21 @@
     "action": {
       "default_title": "Google map chrome extension"
     },
-    "permissions": ["activeTab", "storage","https://www.google.com/", "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com"],
+    "permissions": ["activeTab", "storage"],
     "content_scripts": [
       {
         "matches": ["*://www.google.com/maps/*"],
         "js": ["content.js"]
       }
-    ]
+    ],
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'",
+      "sandbox": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com; object-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://maps.googleapis.com; font-src 'self'; connect-src 'self'; media-src 'self'",
+      "extension_pages": "script-src 'self'; object-src 'self'",
+      "sandbox": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com; object-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://maps.googleapis.com; font-src 'self'; connect-src 'self'; media-src 'self'",
+      "web_accessible_resources": [
+        "resources/penguin_walking.png"
+      ]
+    }
   }
   

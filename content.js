@@ -1,5 +1,5 @@
 const script = document.createElement('script');
-script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAbauG84e4IlL78ZiAmnx0DpcFiowviJKs";
+script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAbauG84e4IlL78ZiAmnx0DpcFiowviJKs=initMap";
 document.head.appendChild(script);
 
 function initMap(){
