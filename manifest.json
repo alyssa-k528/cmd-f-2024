@@ -6,7 +6,7 @@
     "action": {
       "default_title": "Google map chrome extension"
     },
-    "permissions": ["activeTab", "storage"],
+    "permissions": ["activeTab", "storage","https://www.google.com/", "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com"],
     "content_scripts": [
       {
         "matches": ["*://www.google.com/maps/*"],
