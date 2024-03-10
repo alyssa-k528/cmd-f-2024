@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="title.css">
+    <link rel="stylesheet" href="instructions.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Madimi+One&display=swap" rel="stylesheet">
@@ -11,5 +11,38 @@
     <link rel="icon" href="resources/penguin_walking.png" type="image/x-icon">
 </head>
 <body>
+    <div class="container">
+        <div class="col-md-12">
+          <div class="area">
+            <div class="row">
+              <div class="add-damage btn" type="button" onclick="playerAttack()">Attack</div>
+            </div>
+            <div class="total"></div>
+            <div class="health-box">
+              <div id="player-health-bar" class="health-bar-red"></div>
+              <div id="enemy-health-bar" class="health-bar-blue"></div>
+              <div class="health-bar"></div>
+            </div>
+            <img id="player" src="resources/penguin-player.png" alt="player" class="player">
+          </div>
+        </div>
+        <div class="col-md-12">
+            <div class="area">
+              <div class="row">
+                <div class="add-damage btn" type="button" onclick="playerAttack()">Attack</div>
+              </div>
+              <div class="total"></div>
+              <div class="health-box">
+                <div id="player-health-bar" class="health-bar-red"></div>
+                <div id="enemy-health-bar" class="health-bar-blue"></div>
+                <div class="health-bar"></div>
+              </div>
+              <img id="player" src="resources/penguin-enemy.png" alt="player" class="player">
+            </div>
+          </div>
+      </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
