@@ -1,3 +1,5 @@
+const { startIndicesWithElidedDims } = require("@tensorflow/tfjs-core/dist/ops/slice_util");
+
 // Access the user's camera
 navigator.mediaDevices.getUserMedia({ video: true })
     .then(stream => {
@@ -7,35 +9,45 @@ navigator.mediaDevices.getUserMedia({ video: true })
     .catch(err => {
         console.error("Error accessing the camera: ", err);
     });
-// function isFullBodyInView() {
-//     // Placeholder for full body detection logic
-//     // Returns true if a full body is detected, false otherwise
-//     return true; // Replace with actual detection logic
-// }
-// function startCountdown(seconds) {
-//     const countdownElement = document.getElementById('countdown');
-//     let counter = seconds;
-//     const intervalId = setInterval(() => {
-//         countdownElement.innerText = `Game starts in: ${counter}`;
-//         counter--;
-//         if (counter < 0) {
-//             clearInterval(intervalId);
-//             countdownElement.innerText = '';
-//             startGame();
-//         }
-//     }, 1000);
-// }
-// function startGame() {
-//     // Game starts
-//     // Implement game logic here
-//     console.log("Game started!");
-// }
+
+  
+function isFullBodyInView() {
+    // Placeholder for full body detection logic
+    // Returns true if a full body is detected, false otherwise
+    startCountdown(5);
+    return true; // Replace with actual detection logic
+}
+
+function startCountdown(seconds) {
+    const countdownElement = document.getElementById('countdown');
+    let counter = seconds;
+
+    if (isFullBodyInView == true){
+        const intervalId = setInterval(() => {
+            countdownElement.innerText = `Game starts in: ${counter}`;
+            counter--;
+            if (counter < 0) {
+                clearInterval(intervalId);
+                countdownElement.innerText = '';
+                startGame();
+            }
+        }, 1000);
+    }
+}
+
+function startGame() {
+    // Game starts
+    // Implement game logic here
+    console.log("Game started!");
+}
+
 // // Periodically check if the player is in the correct position
 // setInterval(() => {
 //     if (isFullBodyInView()) {
 //         startCountdown(5); // Start a 5-second countdown
 //     }
-// }, 1000); // Check every second as an example
+// }, 1000); // Check every second
+
 async function setupWebcam() {
     const webcamElement = document.getElementById('camera');
     webcamElement.onloadedmetadata = () => {
@@ -61,7 +73,6 @@ async function createDetector() {
     const model = poseDetection.SupportedModels.MoveNet;
     const detectorConfig = {
         modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-        // Other configuration options
     };
     const detector = await poseDetection.createDetector(model, detectorConfig);     
     
@@ -77,11 +88,11 @@ async function createDetector() {
          // Draw keypoints         
         if (poses && poses.length > 0) {
             poses[0].keypoints.forEach(drawKeypoint);
-            //plank(poses[0].keypoints);
-            burpee(poses[0].keypoints);
+            plank(poses[0].keypoints);
+            // burpee(poses[0].keypoints);
+            // jumpJack(poses[0].keypoints);
         }
-        // You might want to draw the results on the video or process them further
-        // ...
+        
         requestAnimationFrame(runPoseDetection); // Continuously run pose detection
         // return poses;
     };
@@ -120,11 +131,14 @@ async function createDetector() {
     };
 
     var score = 0;
+    var exercise_complete = false
     
     function plank(array){
+        exercise_complete = false
 
         for (let i = 0; score >= 10; i++) {
-            var output = console.log("hiiiiiiiiiiiiiiiiiiiiiiii");
+            // var output = console.log("hiiiiiiiiiiiiiiiiiiiiiiii");
+
             // array 15 and 16 are L and R ankles
             //array 9 and 10 are L and R wrists
             if ((array[9].y >= 400 && array[10].y >= 400) && (array[15].score < 0.30 && array[16].score < 0.30)){
@@ -137,14 +151,15 @@ async function createDetector() {
                 return false;
             }
         }
+        exercise_complete = true
 
-        return output;
+        return exercise_complete;
     }
-
 
     function burpee(array) {
         var jump = 0;
         var down = 0;
+        exercise_complete = false
     
         // Add a limit to the number of iterations
         const maxIterations = 50;
@@ -175,7 +190,10 @@ async function createDetector() {
         }
     
         console.log("burpee function done");
-        return true;
+
+        exercise_complete = true
+
+        return exercise_complete;
     }
 
     
@@ -184,9 +202,10 @@ async function createDetector() {
     //     var ankleOut = 0;
     //     var ankleIn = 0;
     //     var clap = 0;
+    //     exercise_complete = false
 
     //     for (let i = 0; armDown <= 10 && ankleOut <= 10 && ankleIn <= 10 && clap <= 10; i++){
-    //         var jackDone = console.log("burpee function done");
+            
     //         // wrists
     //         if(array[9] <= 150 && array[10] <= 150){
     //             clap += 1;
