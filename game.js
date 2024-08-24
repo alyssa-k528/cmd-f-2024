@@ -6,7 +6,7 @@ $(".health-bar-text").html("100%");
 $(".health-bar").css({
   "width": "100%"
 });
-$(".add-damage").click(function () {
+function applyDamage() {
   if (curHealth == 0) {
     $('.message-box').html("Is this the end??");
   } else {
@@ -20,7 +20,7 @@ $(".add-damage").click(function () {
     }
     applyChange(curHealth);
   }
-});
+};
 
 function applyChange(curHealth) {
   var a = curHealth * (100 / maxHealth);
@@ -36,3 +36,7 @@ function restart() {
   $('.health-bar-red, .health-bar');
   $('.message-box').html("You've been knocked down! Thing's are looking bad.");
 }
+
+setInterval(function(){
+  applyDamage()
+}, 3000)
