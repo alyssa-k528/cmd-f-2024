@@ -11,11 +11,10 @@ navigator.mediaDevices.getUserMedia({ video: true })
     });
 
   
-function isFullBodyInView() {
-    // Placeholder for full body detection logic
-    // Returns true if a full body is detected, false otherwise
-    startCountdown(5);
-    return true; // Replace with actual detection logic
+function isFullBodyInView(poses) {
+    if (poses && poses.length > 0) {
+        return true; 
+    } return false;
 }
 
 function startCountdown(seconds) {
@@ -84,17 +83,21 @@ async function createDetector() {
 
         const poses = await detector.estimatePoses(videoElement);
         console.log(poses[0]); 
+
+        isFullBodyInView(poses);
         
          // Draw keypoints         
         if (poses && poses.length > 0) {
             poses[0].keypoints.forEach(drawKeypoint);
+
+            startCountdown(5);
+
             plank(poses[0].keypoints);
             // burpee(poses[0].keypoints);
             // jumpJack(poses[0].keypoints);
         }
         
         requestAnimationFrame(runPoseDetection); // Continuously run pose detection
-        // return poses;
     };
 
     runPoseDetection();
@@ -148,11 +151,11 @@ async function createDetector() {
 
             if (i == 15 && score < 10){
                 console.log("you plank failure");
-                return false;
+                exercise_complete = false
+                return exercise_complete;
             }
         }
         exercise_complete = true
-
         return exercise_complete;
     }
 
