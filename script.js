@@ -8,16 +8,35 @@ navigator.mediaDevices.getUserMedia({ video: true })
         console.error("Error accessing the camera: ", err);
     });
 
-function isFullBodyInView(poses) {
+let countdownStarted = false;  // Flag to ensure countdown starts only once
+
+function isFullBodyInView(poses, canvasElementwidth, canvasElementheight) {
     if (poses && poses.length > 0) {
-        return true; 
-    } return false;
+        const keypoints = poses[0].keypoints;
+        const requiredKeypoints = [0, 5, 6, 9, 10, 11, 12, 15, 16];  // nose, shoulders, wrists, hips, ankles
+
+        // Ensure all required keypoints are detected with a score above a threshold
+        const allKeypointsDetected = requiredKeypoints.every(index => {
+            const kp = keypoints[index];
+
+            console.log(kp);
+            console.log(kp.score);
+            
+            return (kp.score > 0.4) && (kp.x > 0) && (kp.y > 0);  // && (kp.x < canvasElementwidth) && (kp.y < canvasElementheight);
+        });
+
+        // console.log(allKeypointsDetected);
+        return allKeypointsDetected;
+    }
+    return false;
 }
+
 function startCountdown(seconds) {
     const countdownElement = document.getElementById('countdown');
     let counter = seconds;
     const intervalId = setInterval(() => {
         countdownElement.innerText = `Game starts in: ${counter}`;
+        console.log("countdown started");
         counter--;
         if (counter < 0) {
             clearInterval(intervalId);
@@ -26,74 +45,109 @@ function startCountdown(seconds) {
         }
     }, 1000);
 }
-function startGame() {
-    // Game starts
-    // Implement game logic here
-    console.log("Game started!");
-}
-// Periodically check if the player is in the correct position
-setInterval(() => {
-    if (isFullBodyInView()) {
-        startCountdown(5); // Start a 5-second countdown
-    }
-}, 1000); // Check every second as an example
 
-async function setupWebcam() {
+function startGame() {
+    console.log("Game started!");
+    // createDetector();
+}
+
+// // Periodically check if the player is in the correct position
+// setInterval(() => {
+//     if (isFullBodyInView()) {
+//         startCountdown(5); // Start a 5-second countdown
+//     }
+// }, 1000); // Check every second as an example
+
+function checkForFullBodyAndStart() {
+    setupWebcam().then(videoElement => {
+        videoElement.play();
+
+        const model = poseDetection.SupportedModels.MoveNet;
+        const detectorConfig = {
+            modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+        };
+
+        poseDetection.createDetector(model, detectorConfig).then(detector => {
+            const canvasElement = document.getElementById('output');
+            const ctx = canvasElement.getContext('2d');
+
+            const runPoseDetection = () => {
+                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                detector.estimatePoses(videoElement).then(poses => {
+                    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+
+                    if (isFullBodyInView(poses, canvasElement.width, canvasElement.height) && !countdownStarted) {
+                        countdownStarted = true;
+                        startCountdown(5);
+                        createDetector();
+                    }
+
+                    requestAnimationFrame(runPoseDetection);
+                });
+            };
+
+            runPoseDetection();
+
+        }).catch(error => {
+            console.error('Error creating detector:', error);
+        });
+    }).catch(error => {
+        console.error('Error setting up webcam:', error);
+    });
+}
+
+function setupWebcam() {
     const webcamElement = document.getElementById('camera');
-    webcamElement.onloadedmetadata = () => {
-        canvasElement.width = webcamElement.videoWidth;
-        canvasElement.height = webcamElement.videoHeight;
-    };
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 'video': true });
+    return navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
         webcamElement.srcObject = stream;
         return new Promise((resolve) => {
             webcamElement.onloadedmetadata = () => {
                 resolve(webcamElement);
             };
         });
-    } catch (error) {
+    }).catch(error => {
         console.error('Error accessing the webcam:', error);
-    }
+    });
 }
 
 async function createDetector() {
     const videoElement = await setupWebcam();
     videoElement.play();
     const model = poseDetection.SupportedModels.MoveNet;
+
     const detectorConfig = {
         modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-        // Other configuration options
     };
+
     const detector = await poseDetection.createDetector(model, detectorConfig);     
     
     const canvasElement = document.getElementById('output'); // Getting the canvas element
     const ctx = canvasElement.getContext('2d'); // Getting the 2D rendering context
 
-    const runPoseDetection = async () => {
+    const runPoseDetection2 = async () => {
         ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
         const poses = await detector.estimatePoses(videoElement);
+
         console.log(poses[0]); 
 
-        isFullBodyInView(poses);
+        // if (isFullBodyInView(poses) && !countdownStarted) {
+        //     countdownStarted = true; 
+        //     startCountdown(5);
+        // }
         
          // Draw keypoints         
         if (poses && poses.length > 0) {
             poses[0].keypoints.forEach(drawKeypoint);
 
-            startCountdown(5);
-
             plank(poses[0].keypoints);
             // burpee(poses[0].keypoints);
             // jumpJack(poses[0].keypoints);
         }
-        // You might want to draw the results on the video or process them further
-        // ...
-        requestAnimationFrame(runPoseDetection); // Continuously run pose detection
+        
+        requestAnimationFrame(runPoseDetection2); // Continuously run pose detection
     };
 
-    runPoseDetection();
+    runPoseDetection2();
 
     const drawKeypoint = (keypoint) => {         
         const { x, y, score } = keypoint;         
@@ -104,25 +158,6 @@ async function createDetector() {
                 ctx.arc(x, y, 5, 0, 2 * Math.PI);             
                 ctx.fillStyle = "aqua";             
                 ctx.fill();
-                //console.log("hiiiiiiiiiiiiiiiiiiii");   
-
-                // const stopWatch = new Date();
-                // let totalTime = 0;
-                // let startTime = Date.now();
-
-                // function updateTimer() {
-                //     let currentTime = Date.now();
-                //     totalTime += (currentTime - startTime) / 1000; // Convert to seconds
-                //     startTime = currentTime;
-                //     console.log(totalTime);
-
-                //     if (totalTime <= 10) {
-                //         setTimeout(updateTimer, 100); // Update every 100ms
-                //     }
-                // }
-
-                // updateTimer();
-
             }     
     };
 
@@ -140,14 +175,13 @@ async function createDetector() {
                 console.log("score increased by 1");
             }
 
-            if (score < 10){
+            // 1 point is a 100 score
+            if (score < 1000){
                 console.log("you plank failure");
-                exercise_complete = false
-                return exercise_complete;
+                return false;
             }
         }
-        exercise_complete = true
-        return exercise_complete;
+        return true;
     }
 
     function burpee(array) {
@@ -212,4 +246,6 @@ async function createDetector() {
     // }
 
 }
-createDetector();
+
+checkForFullBodyAndStart();
+//createDetector();
