@@ -201,6 +201,11 @@ p {
   bottom: 8px;
 }
 
+.health-bar-text-enemy {
+  position: relative;
+  bottom: 8px;
+}
+
 .message-box {
   text-align: center;
   padding: 5px;

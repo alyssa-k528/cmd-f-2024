@@ -67,6 +67,40 @@ async function setupWebcam() {
     }
 }
 
+$ = jQuery;
+var maxHealth = 100,
+  curHealth = maxHealth;
+$('.total').html(maxHealth + "/" + maxHealth);
+$(".health-bar-text-enemy").html("100%");
+$(".health-bar-enemy").css({
+  "width": "100%"
+});
+
+function applyDamageEnemy() {
+  if (curHealth == 0) {
+    $('.message-box').html("Is this the end??");
+  } else {
+    var damage = 10; // Set a constant damage value
+    $(".health-bar-enemy").stop();
+    curHealth = Math.max(0, curHealth - damage); // Ensure health doesn't go below 0
+    if (curHealth == 0) {
+      restart();
+    } else {
+      $('.message-box').html("You took " + damage + " points of damage!");
+    }
+    applyChangeEnemy(curHealth);
+  }
+};
+
+function applyChangeEnemy(curHealth) {
+  var a = curHealth * (100 / maxHealth);
+  $(".health-bar-text-enemy").html(Math.round(a) + "%");
+  $(".health-bar-enemy").animate({
+    'width': a + "%"
+  }, 500);
+  $('.total').html(curHealth + "/" + maxHealth);
+}
+
 async function createDetector() {
     const videoElement = await setupWebcam();
     videoElement.play();
@@ -88,7 +122,10 @@ async function createDetector() {
          // Draw keypoints         
         if (poses && poses.length > 0) {
             poses[0].keypoints.forEach(drawKeypoint);
-            plank(poses[0].keypoints);
+            var attack = plank(poses[0].keypoints);
+            if (attack) {
+                applyDamageEnemy();
+            }
             // burpee(poses[0].keypoints);
             // jumpJack(poses[0].keypoints);
         }
