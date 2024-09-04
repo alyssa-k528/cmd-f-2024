@@ -10,46 +10,46 @@ navigator.mediaDevices.getUserMedia({ video: true })
 
 let countdownStarted = false;  // Flag to ensure countdown starts only once
 
-function isFullBodyInView(poses, canvasElementwidth, canvasElementheight) {
-    if (poses && poses.length > 0) {
-        const keypoints = poses[0].keypoints;
-        const requiredKeypoints = [0, 5, 6, 9, 10, 11, 12, 15, 16];  // nose, shoulders, wrists, hips, ankles
+// function isFullBodyInView(poses, canvasElementwidth, canvasElementheight) {
+//     if (poses && poses.length > 0) {
+//         const keypoints = poses[0].keypoints;
+//         const requiredKeypoints = [0, 5, 6, 9, 10, 11, 12, 15, 16];  // nose, shoulders, wrists, hips, ankles
 
-        // Ensure all required keypoints are detected with a score above a threshold
-        const allKeypointsDetected = requiredKeypoints.every(index => {
-            const kp = keypoints[index];
+//         // Ensure all required keypoints are detected with a score above a threshold
+//         const allKeypointsDetected = requiredKeypoints.every(index => {
+//             const kp = keypoints[index];
 
-            console.log(kp);
-            console.log(kp.score);
+//             console.log(kp);
+//             console.log(kp.score);
             
-            return (kp.score > 0.4) && (kp.x > 0) && (kp.y > 0);  // && (kp.x < canvasElementwidth) && (kp.y < canvasElementheight);
-        });
+//             return (kp.score > 0.4) && (kp.x > 0) && (kp.y > 0);  // && (kp.x < canvasElementwidth) && (kp.y < canvasElementheight);
+//         });
 
-        // console.log(allKeypointsDetected);
-        return allKeypointsDetected;
-    }
-    return false;
-}
+//         // console.log(allKeypointsDetected);
+//         return allKeypointsDetected;
+//     }
+//     return false;
+// }
 
-function startCountdown(seconds) {
-    const countdownElement = document.getElementById('countdown');
-    let counter = seconds;
-    const intervalId = setInterval(() => {
-        countdownElement.innerText = `Game starts in: ${counter}`;
-        console.log("countdown started");
-        counter--;
-        if (counter < 0) {
-            clearInterval(intervalId);
-            countdownElement.innerText = '';
-            startGame();
-        }
-    }, 1000);
-}
+// function startCountdown(seconds) {
+//     const countdownElement = document.getElementById('countdown');
+//     let counter = seconds;
+//     const intervalId = setInterval(() => {
+//         countdownElement.innerText = `Game starts in: ${counter}`;
+//         console.log("countdown started");
+//         counter--;
+//         if (counter < 0) {
+//             clearInterval(intervalId);
+//             countdownElement.innerText = '';
+//             startGame();
+//         }
+//     }, 1000);
+// }
 
-function startGame() {
-    console.log("Game started!");
-    // createDetector();
-}
+// function startGame() {
+//     console.log("Game started!");
+//     // createDetector();
+// }
 
 // // Periodically check if the player is in the correct position
 // setInterval(() => {
@@ -58,43 +58,43 @@ function startGame() {
 //     }
 // }, 1000); // Check every second as an example
 
-function checkForFullBodyAndStart() {
-    setupWebcam().then(videoElement => {
-        videoElement.play();
+// function checkForFullBodyAndStart() {
+//     setupWebcam().then(videoElement => {
+//         videoElement.play();
 
-        const model = poseDetection.SupportedModels.MoveNet;
-        const detectorConfig = {
-            modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-        };
+//         const model = poseDetection.SupportedModels.MoveNet;
+//         const detectorConfig = {
+//             modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+//         };
 
-        poseDetection.createDetector(model, detectorConfig).then(detector => {
-            const canvasElement = document.getElementById('output');
-            const ctx = canvasElement.getContext('2d');
+//         poseDetection.createDetector(model, detectorConfig).then(detector => {
+//             const canvasElement = document.getElementById('output');
+//             const ctx = canvasElement.getContext('2d');
 
-            const runPoseDetection = () => {
-                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                detector.estimatePoses(videoElement).then(poses => {
-                    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+//             const runPoseDetection = () => {
+//                 ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+//                 detector.estimatePoses(videoElement).then(poses => {
+//                     console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
 
-                    if (isFullBodyInView(poses, canvasElement.width, canvasElement.height) && !countdownStarted) {
-                        countdownStarted = true;
-                        startCountdown(5);
-                        createDetector();
-                    }
+//                     if (isFullBodyInView(poses, canvasElement.width, canvasElement.height) && !countdownStarted) {
+//                         countdownStarted = true;
+//                         startCountdown(5);
+//                         createDetector();
+//                     }
 
-                    requestAnimationFrame(runPoseDetection);
-                });
-            };
+//                     requestAnimationFrame(runPoseDetection);
+//                 });
+//             };
 
-            runPoseDetection();
+//             runPoseDetection();
 
-        }).catch(error => {
-            console.error('Error creating detector:', error);
-        });
-    }).catch(error => {
-        console.error('Error setting up webcam:', error);
-    });
-}
+//         }).catch(error => {
+//             console.error('Error creating detector:', error);
+//         });
+//     }).catch(error => {
+//         console.error('Error setting up webcam:', error);
+//     });
+// }
 
 function setupWebcam() {
     const webcamElement = document.getElementById('camera');
@@ -172,13 +172,7 @@ async function createDetector() {
             //array 9 and 10 are L and R wrists
             if ((array[9].y >= 400 && array[10].y >= 400) && (array[15].score < 0.30 && array[16].score < 0.30)){
                 score += 1;
-                console.log("score increased by 1");
-            }
-
-            // 1 point is a 100 score
-            if (score < 1000){
-                console.log("you plank failure");
-                return false;
+                console.log("plank score increased by 1");
             }
         }
         return true;
@@ -247,5 +241,5 @@ async function createDetector() {
 
 }
 
-checkForFullBodyAndStart();
-//createDetector();
+// checkForFullBodyAndStart();
+createDetector();
